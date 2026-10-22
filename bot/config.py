@@ -2,9 +2,11 @@ import os, hashlib
 from dotenv import load_dotenv
 load_dotenv()
 
-BOT_TOKEN = os.getenv("BOT_TOKEN", "")
+BOT_TOKEN = os.getenv("BOT_TOKEN", "").strip()
+if not BOT_TOKEN:
+    raise RuntimeError("BOT_TOKEN is missing: add it in Railway Variables before deployment.")
 OWNER_ID = int(os.getenv("OWNER_ID", "8725329015"))
-WEBAPP_URL = os.getenv("WEBAPP_URL", "http://127.0.0.1:8000").rstrip("/")
+WEBAPP_URL = os.getenv("WEBAPP_URL", "").strip().rstrip("/")
 PORT = int(os.getenv("PORT", 8000))
 DB_PATH = os.getenv("DB_PATH", "trazen.db")          # on Railway: /data/trazen.db (Volume)
 WEBHOOK_SECRET = os.getenv("WEBHOOK_SECRET") or hashlib.sha256(BOT_TOKEN.encode()).hexdigest()[:32]

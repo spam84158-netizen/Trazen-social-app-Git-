@@ -1,4 +1,4 @@
-import aiosqlite, secrets, time, random
+import aiosqlite, secrets, time, random, os
 from bot.config import DB_PATH, OWNER_ID, FREE_AI_DAILY
 
 def now(): return int(time.time())
@@ -48,6 +48,8 @@ async def execute(sql, a=(), ret="rc"):
         return cur.rowcount if ret == "rc" else cur.lastrowid
 
 async def init_db():
+    parent = os.path.dirname(os.path.abspath(DB_PATH))
+    os.makedirs(parent, exist_ok=True)
     async with aiosqlite.connect(DB_PATH, timeout=15) as db:
         await db.execute("PRAGMA journal_mode=WAL")
         await db.executescript(SCHEMA)

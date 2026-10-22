@@ -77,8 +77,16 @@ BG = []
 async def lifespan(app: FastAPI):
     await D.init_db(); await ptb.initialize(); await ptb.start()
     await ptb.bot.set_my_commands([BotCommand(c, d) for c, d in COMMAND_LIST])
-    await ptb.bot.set_webhook(f"{WEBAPP_URL}/webhook", secret_token=WEBHOOK_SECRET, drop_pending_updates=False,
-                              allowed_updates=["message", "callback_query", "pre_checkout_query", "my_chat_member"])
+    if WEBAPP_URL:
+        if not WEBAPP_URL.startswith("https://"):
+            raise RuntimeError("WEBAPP_URL must be the public HTTPS Railway domain, without a trailing slash.")
+        await ptb.bot.set_webhook(f"{WEBAPP_URL}/webhook", secret_token=WEBHOOK_SECRET, drop_pending_updates=False,
+                                  allowed_updates=["message", "callback_query", "pre_checkout_query", "my_chat_member"])
+        log.info("Telegram webhook configured: %s/webhook", WEBAPP_URL)
+    else:
+        # First deployment: Railway must start once so its public domain can be generated.
+        # Add WEBAPP_URL in Railway Variables afterwards; the next restart registers the webhook.
+        log.warning("WEBAPP_URL is not set yet; web app can start, but Telegram updates will not arrive until it is configured.")
     BG.extend([asyncio.create_task(A.whale_loop(ptb.bot)), asyncio.create_task(A.capsule_loop(ptb.bot))])
     yield
     for t in BG: t.cancel()
