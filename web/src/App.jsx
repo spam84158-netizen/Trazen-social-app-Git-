@@ -6,7 +6,9 @@ import Logo from "./Logo.jsx";
 const TABS = [["wallet", "💰", "Wallet"], ["lottery", "🎰", "Lottery"], ["dream", "🌙", "Dreams"], ["crm", "🧠", "CRM"], ["earn", "📺", "Earn"]];
 
 export default function App() {
-  const initial = new URLSearchParams(location.search).get("p") || "wallet";
+  const ALIAS = { premium: "wallet", tasks: "earn", home: "wallet", "": "wallet" };
+  const rawP = (new URLSearchParams(location.search).get("p") || "wallet").toLowerCase();
+  const initial = ALIAS[rawP] || rawP;
   const [page, setPage] = useState(initial), [me, setMe] = useState(null), [err, setErr] = useState("");
   const reload = useCallback(() => api("/api/me").then(setMe).catch((e) => setErr(e.message)), []);
   useEffect(() => { tg?.ready(); tg?.expand(); tg?.setHeaderColor?.("#0a0a0f"); tg?.setBackgroundColor?.("#0a0a0f"); if (initData) reload(); }, [reload]);

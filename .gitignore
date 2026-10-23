@@ -1,10 +1,2 @@
-.env
-.env.*
-!.env.example
-__pycache__/
-*.py[cod]
-*.db
-*.sqlite3
-node_modules/
-web/dist/
-.venv/
+node_modules
+dist
